@@ -46,4 +46,6 @@ Now we acquire an image from the swap chain with `vkAcquireNextImageKHR`, select
 - Allocate and record a command buffer `VkCommandBuffer` with the draw commands for every possible swap chain image
 - Draw frames by acquiring images `vkAcquireNextImageKHR`, submitting the right draw command buffer `vkQueueSubmit`, and returning the images back to the swap chain `vkQueuPresentKHR`.
 
+# Coding conventions
 
+Vulkan functions have a lower case `vk` prefix, enums and structs have a `Vk` prefix, and enum values have a `VK_` prefix. The API heavily uses structs to provide parameters to functions.
