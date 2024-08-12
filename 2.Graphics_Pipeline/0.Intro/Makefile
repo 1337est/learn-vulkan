@@ -29,7 +29,7 @@ CC = g++
 #  -Werror				- Treats all warning messages as errors, making the
 #  						  compilation fail if there are any warnings. Used to
 #  						  enforce a strict policy on code quality
-CFLAGS = -ggdb -std=c++23 -pedantic -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion
+CFLAGS = -ggdb -std=c++23 -pedantic -Wall -Wextra -Wconversion
 
 # Linker flags
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
