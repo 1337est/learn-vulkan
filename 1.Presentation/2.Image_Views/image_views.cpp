@@ -48,6 +48,10 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
+    QueueFamilyIndices(std::optional<uint32_t> graphicsFamily = std::nullopt, std::optional<uint32_t> presentFamily = std::nullopt)
+        : graphicsFamily(graphicsFamily)
+        , presentFamily(presentFamily)
+    {}
 
     bool isComplete() {
         return graphicsFamily.has_value() && presentFamily.has_value();
@@ -58,10 +62,35 @@ struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
+    SwapChainSupportDetails(
+        VkSurfaceCapabilitiesKHR capabilities = {},
+        std::vector<VkSurfaceFormatKHR> formats = {},
+        std::vector<VkPresentModeKHR> presentModes = {})
+        : capabilities(capabilities)
+        , formats(formats)
+        , presentModes(presentModes) {}
 };
 
 class HelloTriangleApplication {
 public:
+    HelloTriangleApplication()
+        : window()
+        , instance(VK_NULL_HANDLE)
+        , debugMessenger(VK_NULL_HANDLE)
+        , surface(VK_NULL_HANDLE)
+        , device(VK_NULL_HANDLE)
+        , graphicsQueue(VK_NULL_HANDLE)
+        , presentQueue(VK_NULL_HANDLE)
+        , swapChain(VK_NULL_HANDLE)
+        , swapChainImages()
+        , swapChainImageFormat()
+        , swapChainExtent()
+        , swapChainImageViews()
+    {}
+
+    HelloTriangleApplication(const HelloTriangleApplication& source);
+    HelloTriangleApplication& operator=(const HelloTriangleApplication& source);
+
     void run() {
         initWindow();
         initVulkan();
@@ -444,7 +473,7 @@ private:
         std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-        int i = 0;
+        uint32_t i = 0;
         for (const auto& queueFamily : queueFamilies) {
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 indices.graphicsFamily = i;
@@ -506,7 +535,7 @@ private:
         return true;
     }
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback([[maybe_unused]] VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, [[maybe_unused]] void* pUserData) {
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;
