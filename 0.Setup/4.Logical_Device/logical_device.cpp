@@ -40,6 +40,10 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
 
+    QueueFamilyIndices(std::optional<uint32_t> graphicsFamily = std::nullopt)
+        : graphicsFamily(graphicsFamily)
+    {}
+
     bool isComplete() {
         return graphicsFamily.has_value();
     }
@@ -47,6 +51,14 @@ struct QueueFamilyIndices {
 
 class HelloTriangleApplication {
 public:
+    HelloTriangleApplication()
+        : window()
+        , instance(VK_NULL_HANDLE)
+        , debugMessenger(VK_NULL_HANDLE)
+        , device(VK_NULL_HANDLE)
+        , graphicsQueue(VK_NULL_HANDLE)
+    {}
+
     void run() {
         initWindow();
         initVulkan();
@@ -289,7 +301,7 @@ private:
         return true;
     }
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback([[maybe_unused]] VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, [[maybe_unused]] void* pUserData) {
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;
