@@ -21,7 +21,7 @@ int main() {
 
     glm::mat4 matrix;
     glm::vec4 vec;
-    auto test = matrix * vec;
+    [[maybe_unused]] auto test = matrix * vec;
 
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
