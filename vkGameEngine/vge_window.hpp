@@ -5,8 +5,10 @@
 
 #include <string>
 
-namespace vge {
-class VgeWindow {
+namespace vge
+{
+class VgeWindow
+{
 public: // constructor & destructor
     VgeWindow(int width, int height, std::string name);
     ~VgeWindow();

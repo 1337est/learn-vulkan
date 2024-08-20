@@ -2,17 +2,25 @@
 
 #include <GLFW/glfw3.h>
 
-namespace vge {
-VgeWindow::VgeWindow(int width, int height, std::string name) : m_window{nullptr}, m_width{width}, m_height{height}, m_name(name) {
+namespace vge
+{
+VgeWindow::VgeWindow(int width, int height, std::string name)
+    : m_window{nullptr}
+    , m_width{width}
+    , m_height{height}
+    , m_name(name)
+{
     initWindow();
 }
 
-VgeWindow::~VgeWindow() {
+VgeWindow::~VgeWindow()
+{
     glfwDestroyWindow(m_window); // Destroys our window context on exit
     glfwTerminate(); // free all remaining resources and uninitialize glfw
 }
 
-void VgeWindow::initWindow() {
+void VgeWindow::initWindow()
+{
     glfwInit(); // initialize glfw library
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Don't create OpenGL context
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // No resizeable windows
