@@ -5,7 +5,10 @@
 namespace vge
 {
 VgeWindow::VgeWindow(int width, int height, std::string name)
-    : m_window{nullptr}, m_width{width}, m_height{height}, m_name(name)
+    : m_window{ nullptr }
+    , m_width{ width }
+    , m_height{ height }
+    , m_name(name)
 {
     initWindow();
 }
@@ -26,4 +29,10 @@ void VgeWindow::initWindow()
     m_window =
         glfwCreateWindow(m_width, m_height, m_name.c_str(), nullptr, nullptr);
 }
+
+void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+{}
+
+void test()
+{}
 } // namespace vge

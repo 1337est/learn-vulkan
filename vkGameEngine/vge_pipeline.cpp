@@ -6,15 +6,15 @@
 
 namespace vge
 {
-VgePipeline::VgePipeline(const std::string &vertFilepath,
-                         const std::string &fragFilePath)
+VgePipeline::VgePipeline(const std::string& vertFilepath,
+                         const std::string& fragFilePath)
 {
     createGraphicsPipeline(vertFilepath, fragFilePath);
 }
 
-std::vector<char> VgePipeline::readFile(const std::string &filepath)
+std::vector<char> VgePipeline::readFile(const std::string& filepath)
 {
-    std::ifstream file{filepath, std::ios::ate | std::ios::binary};
+    std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
 
     if (!file.is_open())
     {
@@ -31,8 +31,8 @@ std::vector<char> VgePipeline::readFile(const std::string &filepath)
     return buffer;
 }
 
-void VgePipeline::createGraphicsPipeline(const std::string &vertFilepath,
-                                         const std::string &fragFilePath)
+void VgePipeline::createGraphicsPipeline(const std::string& vertFilepath,
+                                         const std::string& fragFilePath)
 {
     auto vertCode = readFile(vertFilepath);
     auto fragCode = readFile(fragFilePath);
