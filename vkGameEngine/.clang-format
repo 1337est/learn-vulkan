@@ -59,8 +59,8 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
 AttributeMacros:
   - __capability
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false
+BinPackParameters: false
 BitFieldColonSpacing: Both
 BraceWrapping:
   AfterCaseLabel:  false
@@ -154,14 +154,14 @@ LambdaBodyIndentation: OuterScope
 LineEnding:      DeriveLF
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
-MaxEmptyLinesToKeep: 1
+MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Auto
 ObjCBlockIndentWidth: 2
 ObjCBreakBeforeNestedBlockParam: true
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
-PackConstructorInitializers: BinPack
+PackConstructorInitializers: NextLineOnly
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 300

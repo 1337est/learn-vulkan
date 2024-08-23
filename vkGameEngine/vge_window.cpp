@@ -1,14 +1,13 @@
 #include "vge_window.hpp"
 
 #include <GLFW/glfw3.h>
+#include <stdexcept>
 
 namespace vge
 {
+
 VgeWindow::VgeWindow(int width, int height, std::string name)
-    : m_window{ nullptr }
-    , m_width{ width }
-    , m_height{ height }
-    , m_name(name)
+    : m_window{ nullptr }, m_width{ width }, m_height{ height }, m_name(name)
 {
     initWindow();
 }
@@ -30,9 +29,14 @@ void VgeWindow::initWindow()
         glfwCreateWindow(m_width, m_height, m_name.c_str(), nullptr, nullptr);
 }
 
-void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
-{}
+void VgeWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+{
+    // Create the surface in the window, enabling the display of rendered images
+    if (glfwCreateWindowSurface(instance, m_window, nullptr, surface) !=
+        VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create window surface");
+    }
+}
 
-void test()
-{}
 } // namespace vge

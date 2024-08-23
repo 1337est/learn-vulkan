@@ -8,12 +8,15 @@
 
 namespace vge
 {
+
 class VgeWindow
 {
-public: // constructor & destructor
-    VgeWindow(int width, int height, std::string name);
-    ~VgeWindow();
+public:
+    VgeWindow(int width, int height, std::string name); // constructor
+    ~VgeWindow();                                       // destructor
 
+    // Disable copy constructor and copy assignment operator= to prevent
+    // undefined behavior with GLFWwindow* m_window pointer variable
     VgeWindow(const VgeWindow&) = delete;
     VgeWindow& operator=(const VgeWindow&) = delete;
 
@@ -32,4 +35,5 @@ private: // member variables and functions
 
     void initWindow();
 };
+
 } // namespace vge

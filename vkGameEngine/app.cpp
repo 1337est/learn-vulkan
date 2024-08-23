@@ -4,9 +4,12 @@
 
 namespace vge
 {
+
 void App::run()
 {
+    // run until window closes
     while (!m_vgeWindow.shouldClose())
-        glfwPollEvents();
+        glfwPollEvents(); // continuously processes and returns received events
 }
+
 } // namespace vge
