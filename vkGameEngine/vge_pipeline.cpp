@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <vulkan/vulkan_core.h>
 
 namespace vge
 {
@@ -99,15 +100,22 @@ void VgePipeline::createGraphicsPipeline(const std::string& vertFilepath,
     vertexInputInfo.pVertexAttributeDescriptions = nullptr;
     vertexInputInfo.pVertexBindingDescriptions = nullptr;
 
+    // combine viewport and scissor
+    VkPipelineViewportStateCreateInfo viewportInfo{};
+    viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewportInfo.viewportCount = 1;
+    viewportInfo.pViewports = &configInfo.viewport;
+    viewportInfo.scissorCount = 1;
+    viewportInfo.pScissors = &configInfo.scissor;
+
     // Graphics pipeline info
     VkGraphicsPipelineCreateInfo pipelineInfo{};
-    pipelineInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2; // vertex && fragment
     pipelineInfo.pStages = shaderStages;
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
-    pipelineInfo.pViewportState = &configInfo.viewportInfo;
+    pipelineInfo.pViewportState = &viewportInfo;
     pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
     pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
     pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
@@ -151,6 +159,11 @@ void VgePipeline::createShaderModule(const std::vector<char>& code,
     }
 }
 
+void VgePipeline::bind(VkCommandBuffer commandBuffer)
+{
+    vkCmdBindPipeline(
+        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
+}
 //
 PipelineConfigInfo VgePipeline::defaultPipelineConfigInfo(uint32_t width,
                                                           uint32_t height)
@@ -174,14 +187,6 @@ PipelineConfigInfo VgePipeline::defaultPipelineConfigInfo(uint32_t width,
     // cut of our image
     configInfo.scissor.offset = { 0, 0 };
     configInfo.scissor.extent = { width, height };
-
-    // combine viewport and scissor
-    configInfo.viewportInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    configInfo.viewportInfo.viewportCount = 1;
-    configInfo.viewportInfo.pViewports = &configInfo.viewport;
-    configInfo.viewportInfo.scissorCount = 1;
-    configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
     // Creates pixels for our topology
     configInfo.rasterizationInfo.sType =

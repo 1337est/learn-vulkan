@@ -13,7 +13,6 @@ struct PipelineConfigInfo
 {
     VkViewport viewport;
     VkRect2D scissor;
-    VkPipelineViewportStateCreateInfo viewportInfo;
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
     VkPipelineRasterizationStateCreateInfo rasterizationInfo;
     VkPipelineMultisampleStateCreateInfo multisampleInfo;
@@ -27,7 +26,6 @@ struct PipelineConfigInfo
     PipelineConfigInfo()
         : viewport{}
         , scissor{}
-        , viewportInfo{}
         , inputAssemblyInfo{}
         , rasterizationInfo{}
         , multisampleInfo{}
@@ -48,6 +46,8 @@ public:
 
     VgePipeline(const VgePipeline&) = delete;
     void operator=(const VgePipeline&) = delete;
+
+    void bind(VkCommandBuffer commandBuffer);
 
     static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width,
                                                         uint32_t height);

@@ -1,0 +1,3 @@
+./vkGameEngine/.env
+./vkGameEngine/*.out
+./vkGameEngine/shaders/*.spv
