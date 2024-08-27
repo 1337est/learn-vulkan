@@ -1,10 +1,12 @@
 #pragma once
 
+// headers
 #include "vge_device.hpp"
+#include <vulkan/vulkan_core.h>
 
+// std
 #include <string>
 #include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace vge
 {

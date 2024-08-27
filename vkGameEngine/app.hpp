@@ -1,10 +1,13 @@
 #pragma once
 
+// headers
 #include "vge_device.hpp"
+#include "vge_model.hpp"
 #include "vge_pipeline.hpp"
 #include "vge_swapchain.hpp"
 #include "vge_window.hpp"
 
+// std
 #include <memory>
 #include <vector>
 
@@ -26,6 +29,7 @@ public:
     void run();
 
 private:
+    void loadModels();
     void createPipelineLayout();
     void createPipeline();
     void createCommandBuffers();
@@ -37,6 +41,7 @@ private:
     std::unique_ptr<VgePipeline> m_vgePipeline;
     VkPipelineLayout m_pipelineLayout;
     std::vector<VkCommandBuffer> m_commandBuffers;
+    std::unique_ptr<VgeModel> m_vgeModel;
 };
 
 } // namespace vge

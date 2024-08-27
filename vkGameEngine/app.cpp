@@ -1,18 +1,22 @@
+// headers
 #include "app.hpp"
 #include "vge_pipeline.hpp"
 
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan_core.h>
+
+// std
 #include <array>
 #include <memory>
 #include <stdexcept>
-#include <vulkan/vulkan_core.h>
 
 namespace vge
 {
 
 App::App()
-    : m_vgePipeline{}, m_pipelineLayout{}, m_commandBuffers{}
+    : m_vgePipeline{}, m_pipelineLayout{}, m_commandBuffers{}, m_vgeModel{}
 {
+    loadModels();
     createPipelineLayout();
     createPipeline();
     createCommandBuffers();
@@ -32,6 +36,14 @@ void App::run()
     }
 
     vkDeviceWaitIdle(m_vgeDevice.device());
+}
+
+void App::loadModels()
+{
+    std::vector<VgeModel::Vertex> vertices{ { { 0.0f, -0.5f } },
+                                            { { 0.5f, 0.5f } },
+                                            { { -0.5f, 0.5f } } };
+    m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
 }
 void App::createPipelineLayout()
 {
@@ -111,7 +123,8 @@ void App::createCommandBuffers()
             m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         m_vgePipeline->bind(m_commandBuffers[i]);
-        vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+        m_vgeModel->bind(m_commandBuffers[i]);
+        m_vgeModel->draw(m_commandBuffers[i]);
 
         vkCmdEndRenderPass(m_commandBuffers[i]);
         if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS)

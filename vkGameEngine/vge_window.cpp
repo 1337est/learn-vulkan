@@ -1,6 +1,9 @@
+// headers
 #include "vge_window.hpp"
 
 #include <GLFW/glfw3.h>
+
+// std
 #include <stdexcept>
 
 namespace vge

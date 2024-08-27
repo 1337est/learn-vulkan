@@ -1,6 +1,7 @@
+// headers
 #include "vge_device.hpp"
 
-// std headers
+// std
 #include <cstring>
 #include <iostream>
 #include <set>

@@ -1,8 +1,9 @@
 #pragma once
 
+// headers
 #include "vge_window.hpp"
 
-// std lib headers
+// std
 #include <string>
 #include <vector>
 
