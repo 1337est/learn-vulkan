@@ -10,7 +10,10 @@ namespace vge
 {
 
 VgeWindow::VgeWindow(int width, int height, std::string name)
-    : m_window{ nullptr }, m_width{ width }, m_height{ height }, m_name(name)
+    : m_window{ nullptr }
+    , m_width{ width }
+    , m_height{ height }
+    , m_name(name)
 {
     initWindow();
 }
@@ -25,11 +28,13 @@ void VgeWindow::initWindow()
 {
     glfwInit();                                   // initialize glfw library
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Don't create OpenGL context
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   // No resizeable windows
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);    // No resizeable windows
 
     // create the window
     m_window =
         glfwCreateWindow(m_width, m_height, m_name.c_str(), nullptr, nullptr);
+    glfwSetWindowUserPointer(m_window, this);
+    glfwSetFramebufferSizeCallback(m_window, frameBufferResizeCallback);
 }
 
 void VgeWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
@@ -40,6 +45,18 @@ void VgeWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
     {
         throw std::runtime_error("Failed to create window surface");
     }
+}
+
+void VgeWindow::frameBufferResizeCallback(
+    GLFWwindow* window,
+    int width,
+    int height)
+{
+    auto vgeWindow =
+        reinterpret_cast<VgeWindow*>(glfwGetWindowUserPointer(window));
+    vgeWindow->m_frameBufferResized = true;
+    vgeWindow->m_width = width;
+    vgeWindow->m_height = height;
 }
 
 } // namespace vge

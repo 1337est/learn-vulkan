@@ -157,7 +157,8 @@ void VgePipeline::createGraphicsPipeline(
 
 // Creates the shader module info from compiled shader bytecode
 void VgePipeline::createShaderModule(
-    const std::vector<char>& code, VkShaderModule* shaderModule)
+    const std::vector<char>& code,
+    VkShaderModule* shaderModule)
 {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType =
@@ -166,8 +167,10 @@ void VgePipeline::createShaderModule(
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     if (vkCreateShaderModule(
-            m_vgeDevice.device(), &createInfo, nullptr, shaderModule) !=
-        VK_SUCCESS)
+            m_vgeDevice.device(),
+            &createInfo,
+            nullptr,
+            shaderModule) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create shader module");
     }
@@ -176,12 +179,15 @@ void VgePipeline::createShaderModule(
 void VgePipeline::bind(VkCommandBuffer commandBuffer)
 {
     vkCmdBindPipeline(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
+        commandBuffer,
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_graphicsPipeline);
 }
 
 //
 PipelineConfigInfo VgePipeline::defaultPipelineConfigInfo(
-    uint32_t width, uint32_t height)
+    uint32_t width,
+    uint32_t height)
 {
     PipelineConfigInfo configInfo{}; // Vulkan struct with configs
 

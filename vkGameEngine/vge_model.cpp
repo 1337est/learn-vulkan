@@ -38,7 +38,12 @@ void VgeModel::createVertexBuffers(const std::vector<Vertex>& vertices)
         m_vertexBufferMemory);
     void* data;
     vkMapMemory(
-        m_vgeDevice.device(), m_vertexBufferMemory, 0, bufferSize, 0, &data);
+        m_vgeDevice.device(),
+        m_vertexBufferMemory,
+        0,
+        bufferSize,
+        0,
+        &data);
     memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
     vkUnmapMemory(m_vgeDevice.device(), m_vertexBufferMemory);
 }

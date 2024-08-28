@@ -32,7 +32,8 @@ VkResult CreateDebugUtilsMessengerEXT(
     VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-        instance, "vkCreateDebugUtilsMessengerEXT");
+        instance,
+        "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr)
     {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
@@ -50,7 +51,8 @@ void DestroyDebugUtilsMessengerEXT(
     const VkAllocationCallbacks* pAllocator)
 {
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-        instance, "vkDestroyDebugUtilsMessengerEXT");
+        instance,
+        "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr)
     {
         func(instance, debugMessenger, pAllocator);
@@ -304,7 +306,10 @@ void VgeDevice::setupDebugMessenger()
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
     populateDebugMessengerCreateInfo(createInfo);
     if (CreateDebugUtilsMessengerEXT(
-            m_instance, &createInfo, nullptr, &m_debugMessenger) != VK_SUCCESS)
+            m_instance,
+            &createInfo,
+            nullptr,
+            &m_debugMessenger) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to set up debug messenger!");
     }
@@ -349,7 +354,8 @@ std::vector<const char*> VgeDevice::getRequiredExtensions()
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
     std::vector<const char*> extensions(
-        glfwExtensions, glfwExtensions + glfwExtensionCount);
+        glfwExtensions,
+        glfwExtensions + glfwExtensionCount);
 
     if (m_enableValidationLayers)
     {
@@ -366,7 +372,9 @@ void VgeDevice::hasGflwRequiredInstanceExtensions()
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(
-        nullptr, &extensionCount, extensions.data());
+        nullptr,
+        &extensionCount,
+        extensions.data());
 
     std::cout << "available extensions:" << std::endl;
     std::unordered_set<std::string> available;
@@ -393,14 +401,21 @@ bool VgeDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(
-        device, nullptr, &extensionCount, nullptr);
+        device,
+        nullptr,
+        &extensionCount,
+        nullptr);
 
     std::vector<VkExtensionProperties> availableExtensions(extensionCount);
     vkEnumerateDeviceExtensionProperties(
-        device, nullptr, &extensionCount, availableExtensions.data());
+        device,
+        nullptr,
+        &extensionCount,
+        availableExtensions.data());
 
     std::set<std::string> requiredExtensions(
-        m_deviceExtensions.begin(), m_deviceExtensions.end());
+        m_deviceExtensions.begin(),
+        m_deviceExtensions.end());
 
     for (const auto& extension : availableExtensions)
     {
@@ -417,11 +432,15 @@ QueueFamilyIndices VgeDevice::findQueueFamilies(VkPhysicalDevice device)
 
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(
-        device, &queueFamilyCount, nullptr);
+        device,
+        &queueFamilyCount,
+        nullptr);
 
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(
-        device, &queueFamilyCount, queueFamilies.data());
+        device,
+        &queueFamilyCount,
+        queueFamilies.data());
 
     int i = 0;
     for (const auto& queueFamily : queueFamilies)
@@ -435,7 +454,10 @@ QueueFamilyIndices VgeDevice::findQueueFamilies(VkPhysicalDevice device)
         }
         VkBool32 presentSupport = false;
         vkGetPhysicalDeviceSurfaceSupportKHR(
-            device, static_cast<uint32_t>(i), m_surface_, &presentSupport);
+            device,
+            static_cast<uint32_t>(i),
+            m_surface_,
+            &presentSupport);
         if (queueFamily.queueCount > 0 && presentSupport)
         {
             // prevent type conversion
@@ -459,28 +481,42 @@ SwapChainSupportDetails VgeDevice::querySwapChainSupport(
 {
     SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-        device, m_surface_, &details.capabilities);
+        device,
+        m_surface_,
+        &details.capabilities);
 
     uint32_t formatCount;
     vkGetPhysicalDeviceSurfaceFormatsKHR(
-        device, m_surface_, &formatCount, nullptr);
+        device,
+        m_surface_,
+        &formatCount,
+        nullptr);
 
     if (formatCount != 0)
     {
         details.formats.resize(formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(
-            device, m_surface_, &formatCount, details.formats.data());
+            device,
+            m_surface_,
+            &formatCount,
+            details.formats.data());
     }
 
     uint32_t presentModeCount;
     vkGetPhysicalDeviceSurfacePresentModesKHR(
-        device, m_surface_, &presentModeCount, nullptr);
+        device,
+        m_surface_,
+        &presentModeCount,
+        nullptr);
 
     if (presentModeCount != 0)
     {
         details.presentModes.resize(presentModeCount);
         vkGetPhysicalDeviceSurfacePresentModesKHR(
-            device, m_surface_, &presentModeCount, details.presentModes.data());
+            device,
+            m_surface_,
+            &presentModeCount,
+            details.presentModes.data());
     }
     return details;
 }
@@ -513,7 +549,8 @@ VkFormat VgeDevice::findSupportedFormat(
 
 // Find the memory properties for your GPU
 uint32_t VgeDevice::findMemoryType(
-    uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    uint32_t typeFilter,
+    VkMemoryPropertyFlags properties)
 {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProperties);
@@ -605,7 +642,9 @@ void VgeDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer)
 
 // Copy source buffer to destination buffer and cleanup
 void VgeDevice::copyBuffer(
-    VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+    VkBuffer srcBuffer,
+    VkBuffer dstBuffer,
+    VkDeviceSize size)
 {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 

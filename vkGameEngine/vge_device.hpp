@@ -17,7 +17,9 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 
     SwapChainSupportDetails()
-        : capabilities{}, formats{}, presentModes{}
+        : capabilities{}
+        , formats{}
+        , presentModes{}
     {}
 };
 
@@ -29,7 +31,8 @@ struct QueueFamilyIndices
     bool presentFamilyHasValue = false;
 
     QueueFamilyIndices()
-        : graphicsFamily{ 0 }, presentFamily{ 0 }
+        : graphicsFamily{ 0 }
+        , presentFamily{ 0 }
     {}
 
     bool isComplete()
@@ -87,7 +90,8 @@ public:
     }
 
     uint32_t findMemoryType(
-        uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        uint32_t typeFilter,
+        VkMemoryPropertyFlags properties);
 
     QueueFamilyIndices findPhysicalQueueFamilies()
     {

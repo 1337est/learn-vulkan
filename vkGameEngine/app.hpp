@@ -46,10 +46,12 @@ private:
     void createPipeline();
     void createCommandBuffers();
     void drawFrame();
+    void recreateSwapChain();
+    void recordCommandBuffer(size_t imageIndex);
 
     VgeWindow m_vgeWindow{ WIDTH, HEIGHT, "Hello Vulkan!" }; //  window
     VgeDevice m_vgeDevice{ m_vgeWindow }; // use device for window
-    VgeSwapChain m_vgeSwapChain{ m_vgeDevice, m_vgeWindow.getExtent() };
+    std::unique_ptr<VgeSwapChain> m_vgeSwapChain;
     std::unique_ptr<VgePipeline> m_vgePipeline;
     VkPipelineLayout m_pipelineLayout;
     std::vector<VkCommandBuffer> m_commandBuffers;

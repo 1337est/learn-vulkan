@@ -53,7 +53,8 @@ public:
     void bind(VkCommandBuffer commandBuffer);
 
     static PipelineConfigInfo defaultPipelineConfigInfo(
-        uint32_t width, uint32_t height);
+        uint32_t width,
+        uint32_t height);
 
 private:
     static std::vector<char> readFile(const std::string& filepath);
@@ -64,7 +65,8 @@ private:
         const PipelineConfigInfo& configInfo);
 
     void createShaderModule(
-        const std::vector<char>& code, VkShaderModule* shaderModule);
+        const std::vector<char>& code,
+        VkShaderModule* shaderModule);
 
     VgeDevice& m_vgeDevice;
     VkPipeline m_graphicsPipeline;

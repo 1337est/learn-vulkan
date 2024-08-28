@@ -46,13 +46,16 @@ public:
     void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 private: // member variables and functions
+    static void frameBufferResizeCallback(
+        GLFWwindow* m_window,
+        int m_width,
+        int m_height);
+    void initWindow();
     GLFWwindow* m_window;
     int m_width;
     int m_height;
     bool m_frameBufferResized = false;
     std::string m_name;
-
-    void initWindow();
 };
 
 } // namespace vge
