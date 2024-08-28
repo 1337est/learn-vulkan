@@ -1,3 +1,4 @@
 ./vkGameEngine/.env
-./vkGameEngine/*.out
-./vkGameEngine/shaders/*.spv
+./vkGameEngine/n.out
+./vkGameEngine/shaders/shader.vert.spv
+./vkGameEngine/shaders/shader.frag.spv

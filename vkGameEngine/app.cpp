@@ -2,9 +2,6 @@
 #include "app.hpp"
 #include "vge_pipeline.hpp"
 
-#include <GLFW/glfw3.h>
-#include <vulkan/vulkan_core.h>
-
 // std
 #include <array>
 #include <memory>
@@ -38,13 +35,61 @@ void App::run()
     vkDeviceWaitIdle(m_vgeDevice.device());
 }
 
+// Sierpinski exercise: draws recursive triangle
+void App::sierpinski(std::vector<VgeModel::Vertex>& vertices,
+                     int cuts,
+                     glm::vec2 a,
+                     glm::vec2 b,
+                     glm::vec2 c,
+                     [[maybe_unused]] glm::vec3 RGBColor)
+{
+    glm::vec3 red = { 1.0f, 0.0f, 0.0f };
+    glm::vec3 green = { 0.0f, 1.0f, 0.0f };
+    glm::vec3 blue = { 0.0f, 0.0f, 1.0f };
+
+    if (cuts <= 0)
+    {
+        vertices.push_back({ a, RGBColor });
+        vertices.push_back({ b, RGBColor });
+        vertices.push_back({ c, RGBColor });
+    }
+    else
+    {
+        auto ab = 0.5f * (a + b);
+        auto ac = 0.5f * (a + c);
+        auto bc = 0.5f * (b + c);
+        // colored like the LOZ triforce (colors counterclockwise)
+        sierpinski(vertices, cuts - 1, a, ab, ac, red);
+        sierpinski(vertices, cuts - 1, ab, b, bc, green);
+        sierpinski(vertices, cuts - 1, ac, bc, c, blue);
+    }
+}
+
 void App::loadModels()
 {
-    std::vector<VgeModel::Vertex> vertices{ { { 0.0f, -0.5f } },
-                                            { { 0.5f, 0.5f } },
-                                            { { -0.5f, 0.5f } } };
+    std::vector<VgeModel::Vertex> vertices{};
+    glm::vec3 vertColor{};
+    sierpinski(vertices,
+               1,
+               { 0.0f, -0.5f },
+               { 0.5f, 0.5f },
+               { -0.5f, 0.5f },
+               vertColor);
     m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
 }
+
+/*
+void App::loadModels()
+{
+    std::vector<VgeModel::Vertex> vertices{
+        { { 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
+        { { 0.5f, 0.5f },  { 0.0f, 1.0f, 0.0f } },
+        { { -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } }
+    };
+    m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
+}
+*/
+
 void App::createPipelineLayout()
 {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};

@@ -7,6 +7,9 @@
 #include "vge_swapchain.hpp"
 #include "vge_window.hpp"
 
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan_core.h>
+
 // std
 #include <memory>
 #include <vector>
@@ -29,6 +32,14 @@ public:
     void run();
 
 private:
+    // Sierpinski exercise: draws recursive triangle
+    void sierpinski(std::vector<VgeModel::Vertex>& vertices,
+                    int cuts,
+                    glm::vec2 a,
+                    glm::vec2 b,
+                    glm::vec2 c,
+                    glm::vec3 color);
+
     void loadModels();
     void createPipelineLayout();
     void createPipeline();
