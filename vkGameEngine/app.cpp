@@ -23,6 +23,7 @@ App::~App()
 {
     vkDestroyPipelineLayout(m_vgeDevice.device(), m_pipelineLayout, nullptr);
 }
+
 void App::run()
 {
     // run until window closes
@@ -36,12 +37,13 @@ void App::run()
 }
 
 // Sierpinski exercise: draws recursive triangle
-void App::sierpinski(std::vector<VgeModel::Vertex>& vertices,
-                     int cuts,
-                     glm::vec2 a,
-                     glm::vec2 b,
-                     glm::vec2 c,
-                     [[maybe_unused]] glm::vec3 RGBColor)
+void App::sierpinski(
+    std::vector<VgeModel::Vertex>& vertices,
+    int cuts,
+    glm::vec2 a,
+    glm::vec2 b,
+    glm::vec2 c,
+    [[maybe_unused]] glm::vec3 RGBColor)
 {
     glm::vec3 red = { 1.0f, 0.0f, 0.0f };
     glm::vec3 green = { 0.0f, 1.0f, 0.0f };
@@ -69,12 +71,13 @@ void App::loadModels()
 {
     std::vector<VgeModel::Vertex> vertices{};
     glm::vec3 vertColor{};
-    sierpinski(vertices,
-               1,
-               { 0.0f, -0.5f },
-               { 0.5f, 0.5f },
-               { -0.5f, 0.5f },
-               vertColor);
+    sierpinski(
+        vertices,
+        1,
+        { 0.0f, -0.5f },
+        { 0.5f, 0.5f },
+        { -0.5f, 0.5f },
+        vertColor);
     m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
 }
 
@@ -98,10 +101,11 @@ void App::createPipelineLayout()
     pipelineLayoutInfo.pSetLayouts = nullptr;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
-    if (vkCreatePipelineLayout(m_vgeDevice.device(),
-                               &pipelineLayoutInfo,
-                               nullptr,
-                               &m_pipelineLayout) != VK_SUCCESS)
+    if (vkCreatePipelineLayout(
+            m_vgeDevice.device(),
+            &pipelineLayoutInfo,
+            nullptr,
+            &m_pipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create pipeline layout!");
     }
@@ -113,10 +117,11 @@ void App::createPipeline()
         m_vgeSwapChain.width(), m_vgeSwapChain.height());
     pipelineConfig.renderPass = m_vgeSwapChain.getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
-    m_vgePipeline = std::make_unique<VgePipeline>(m_vgeDevice,
-                                                  "./shaders/shader.vert.spv",
-                                                  "./shaders/shader.frag.spv",
-                                                  pipelineConfig);
+    m_vgePipeline = std::make_unique<VgePipeline>(
+        m_vgeDevice,
+        "./shaders/shader.vert.spv",
+        "./shaders/shader.frag.spv",
+        pipelineConfig);
 }
 
 void App::createCommandBuffers()
@@ -130,9 +135,9 @@ void App::createCommandBuffers()
     allocInfo.commandBufferCount =
         static_cast<uint32_t>(m_commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(m_vgeDevice.device(),
-                                 &allocInfo,
-                                 m_commandBuffers.data()) != VK_SUCCESS)
+    if (vkAllocateCommandBuffers(
+            m_vgeDevice.device(), &allocInfo, m_commandBuffers.data()) !=
+        VK_SUCCESS)
     {
         throw std::runtime_error("Failed to allocate command buffersf!");
     }
@@ -189,8 +194,8 @@ void App::drawFrame()
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
-    result = m_vgeSwapChain.submitCommandBuffers(&m_commandBuffers[imageIndex],
-                                                 &imageIndex);
+    result = m_vgeSwapChain.submitCommandBuffers(
+        &m_commandBuffers[imageIndex], &imageIndex);
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to present swap chain image!");

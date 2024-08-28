@@ -13,10 +13,11 @@
 namespace vge
 {
 
-VgePipeline::VgePipeline(VgeDevice& device,
-                         const std::string& vertFilepath,
-                         const std::string& fragFilePath,
-                         const PipelineConfigInfo& configInfo)
+VgePipeline::VgePipeline(
+    VgeDevice& device,
+    const std::string& vertFilepath,
+    const std::string& fragFilePath,
+    const PipelineConfigInfo& configInfo)
     : m_vgeDevice{ device }
     , m_graphicsPipeline{}
     , m_vertShaderModule{}
@@ -24,6 +25,7 @@ VgePipeline::VgePipeline(VgeDevice& device,
 {
     createGraphicsPipeline(vertFilepath, fragFilePath, configInfo);
 }
+
 VgePipeline::~VgePipeline()
 {
     vkDestroyShaderModule(m_vgeDevice.device(), m_vertShaderModule, nullptr);
@@ -58,16 +60,19 @@ std::vector<char> VgePipeline::readFile(const std::string& filepath)
     return buffer;
 }
 
-void VgePipeline::createGraphicsPipeline(const std::string& vertFilepath,
-                                         const std::string& fragFilePath,
-                                         const PipelineConfigInfo& configInfo)
+void VgePipeline::createGraphicsPipeline(
+    const std::string& vertFilepath,
+    const std::string& fragFilePath,
+    const PipelineConfigInfo& configInfo)
 {
-    assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
-           "Cannot create graphics pipeline:: no pipelineLayout provided in "
-           "configInfo");
-    assert(configInfo.renderPass != VK_NULL_HANDLE &&
-           "Cannot create graphics pipeline:: no renderPass provided in "
-           "configInfo");
+    assert(
+        configInfo.pipelineLayout != VK_NULL_HANDLE &&
+        "Cannot create graphics pipeline:: no pipelineLayout provided in "
+        "configInfo");
+    assert(
+        configInfo.renderPass != VK_NULL_HANDLE &&
+        "Cannot create graphics pipeline:: no renderPass provided in "
+        "configInfo");
 
     // read binary shader files
     std::vector<char> vertCode = readFile(vertFilepath);
@@ -138,20 +143,21 @@ void VgePipeline::createGraphicsPipeline(const std::string& vertFilepath,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
     // Create graphics pipeline
-    if (vkCreateGraphicsPipelines(m_vgeDevice.device(),
-                                  VK_NULL_HANDLE,
-                                  1,
-                                  &pipelineInfo,
-                                  nullptr,
-                                  &m_graphicsPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(
+            m_vgeDevice.device(),
+            VK_NULL_HANDLE,
+            1,
+            &pipelineInfo,
+            nullptr,
+            &m_graphicsPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create the graphics pipeline");
     }
 }
 
 // Creates the shader module info from compiled shader bytecode
-void VgePipeline::createShaderModule(const std::vector<char>& code,
-                                     VkShaderModule* shaderModule)
+void VgePipeline::createShaderModule(
+    const std::vector<char>& code, VkShaderModule* shaderModule)
 {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType =
@@ -172,9 +178,10 @@ void VgePipeline::bind(VkCommandBuffer commandBuffer)
     vkCmdBindPipeline(
         commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
 }
+
 //
-PipelineConfigInfo VgePipeline::defaultPipelineConfigInfo(uint32_t width,
-                                                          uint32_t height)
+PipelineConfigInfo VgePipeline::defaultPipelineConfigInfo(
+    uint32_t width, uint32_t height)
 {
     PipelineConfigInfo configInfo{}; // Vulkan struct with configs
 

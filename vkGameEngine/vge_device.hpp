@@ -52,7 +52,7 @@ public:
 
     // Not copyable or movable
     VgeDevice(const VgeDevice&) = delete;
-    void operator=(const VgeDevice&) = delete;
+    VgeDevice& operator=(const VgeDevice&) = delete;
     VgeDevice(VgeDevice&&) = delete;
     VgeDevice& operator=(VgeDevice&&) = delete;
 
@@ -60,18 +60,22 @@ public:
     {
         return m_commandPool;
     }
+
     VkDevice device()
     {
         return m_device_;
     }
+
     VkSurfaceKHR surface()
     {
         return m_surface_;
     }
+
     VkQueue graphicsQueue()
     {
         return m_graphicsQueue_;
     }
+
     VkQueue presentQueue()
     {
         return m_presentQueue_;
@@ -81,35 +85,42 @@ public:
     {
         return querySwapChainSupport(m_physicalDevice);
     }
-    uint32_t findMemoryType(uint32_t typeFilter,
-                            VkMemoryPropertyFlags properties);
+
+    uint32_t findMemoryType(
+        uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
     QueueFamilyIndices findPhysicalQueueFamilies()
     {
         return findQueueFamilies(m_physicalDevice);
     }
-    VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
-                                 VkImageTiling tiling,
-                                 VkFormatFeatureFlags features);
+
+    VkFormat findSupportedFormat(
+        const std::vector<VkFormat>& candidates,
+        VkImageTiling tiling,
+        VkFormatFeatureFlags features);
 
     // Buffer Helper Functions
-    void createBuffer(VkDeviceSize size,
-                      VkBufferUsageFlags usage,
-                      VkMemoryPropertyFlags properties,
-                      VkBuffer& buffer,
-                      VkDeviceMemory& bufferMemory);
+    void createBuffer(
+        VkDeviceSize size,
+        VkBufferUsageFlags usage,
+        VkMemoryPropertyFlags properties,
+        VkBuffer& buffer,
+        VkDeviceMemory& bufferMemory);
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-    void copyBufferToImage(VkBuffer buffer,
-                           VkImage image,
-                           uint32_t width,
-                           uint32_t height,
-                           uint32_t layerCount);
+    void copyBufferToImage(
+        VkBuffer buffer,
+        VkImage image,
+        uint32_t width,
+        uint32_t height,
+        uint32_t layerCount);
 
-    void createImageWithInfo(const VkImageCreateInfo& imageInfo,
-                             VkMemoryPropertyFlags properties,
-                             VkImage& image,
-                             VkDeviceMemory& imageMemory);
+    void createImageWithInfo(
+        const VkImageCreateInfo& imageInfo,
+        VkMemoryPropertyFlags properties,
+        VkImage& image,
+        VkDeviceMemory& imageMemory);
 
     VkPhysicalDeviceProperties m_properties;
 

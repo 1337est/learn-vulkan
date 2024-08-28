@@ -20,36 +20,43 @@ public:
     ~VgeSwapChain();
 
     VgeSwapChain(const VgeSwapChain&) = delete;
-    void operator=(const VgeSwapChain&) = delete;
+    VgeSwapChain& operator=(const VgeSwapChain&) = delete;
 
     VkFramebuffer getFrameBuffer(size_t index)
     {
         return m_swapChainFramebuffers[index];
     }
+
     VkRenderPass getRenderPass()
     {
         return m_renderPass;
     }
+
     VkImageView getImageView(size_t index)
     {
         return m_swapChainImageViews[index];
     }
+
     size_t imageCount()
     {
         return m_swapChainImages.size();
     }
+
     VkFormat getSwapChainImageFormat()
     {
         return m_swapChainImageFormat;
     }
+
     VkExtent2D getSwapChainExtent()
     {
         return m_swapChainExtent;
     }
+
     uint32_t width()
     {
         return m_swapChainExtent.width;
     }
+
     uint32_t height()
     {
         return m_swapChainExtent.height;
@@ -60,11 +67,12 @@ public:
         return static_cast<float>(m_swapChainExtent.width) /
                static_cast<float>(m_swapChainExtent.height);
     }
+
     VkFormat findDepthFormat();
 
     VkResult acquireNextImage(uint32_t* imageIndex);
-    VkResult submitCommandBuffers(const VkCommandBuffer* buffers,
-                                  uint32_t* imageIndex);
+    VkResult submitCommandBuffers(
+        const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
 private:
     void createSwapChain();

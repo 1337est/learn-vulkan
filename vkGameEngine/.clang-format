@@ -2,7 +2,7 @@
 Language:        Cpp
 # BasedOnStyle:  Personal
 AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: AlwaysBreak
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments:
   Enabled:         false
@@ -183,7 +183,7 @@ RemoveParentheses: Leave
 RemoveSemicolon: false
 RequiresClausePosition: OwnLine
 RequiresExpressionIndentation: OuterScope
-SeparateDefinitionBlocks: Leave
+SeparateDefinitionBlocks: Always
 ShortNamespaceLines: 0
 SkipMacroDefinitionBody: false
 SortIncludes:    CaseSensitive

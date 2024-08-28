@@ -33,12 +33,13 @@ public:
 
 private:
     // Sierpinski exercise: draws recursive triangle
-    void sierpinski(std::vector<VgeModel::Vertex>& vertices,
-                    int cuts,
-                    glm::vec2 a,
-                    glm::vec2 b,
-                    glm::vec2 c,
-                    glm::vec3 color);
+    void sierpinski(
+        std::vector<VgeModel::Vertex>& vertices,
+        int cuts,
+        glm::vec2 a,
+        glm::vec2 b,
+        glm::vec2 c,
+        glm::vec3 color);
 
     void loadModels();
     void createPipelineLayout();

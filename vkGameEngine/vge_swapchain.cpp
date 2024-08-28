@@ -55,14 +55,16 @@ VgeSwapChain::~VgeSwapChain()
 
     for (int i = 0; i < static_cast<int>(m_depthImages.size()); i++)
     {
-        vkDestroyImageView(m_device.device(),
-                           m_depthImageViews[static_cast<size_t>(i)],
-                           nullptr);
+        vkDestroyImageView(
+            m_device.device(),
+            m_depthImageViews[static_cast<size_t>(i)],
+            nullptr);
         vkDestroyImage(
             m_device.device(), m_depthImages[static_cast<size_t>(i)], nullptr);
-        vkFreeMemory(m_device.device(),
-                     m_depthImageMemorys[static_cast<size_t>(i)],
-                     nullptr);
+        vkFreeMemory(
+            m_device.device(),
+            m_depthImageMemorys[static_cast<size_t>(i)],
+            nullptr);
     }
 
     for (auto framebuffer : m_swapChainFramebuffers)
@@ -85,11 +87,12 @@ VgeSwapChain::~VgeSwapChain()
 
 VkResult VgeSwapChain::acquireNextImage(uint32_t* imageIndex)
 {
-    vkWaitForFences(m_device.device(),
-                    1,
-                    &m_inFlightFences[m_currentFrame],
-                    VK_TRUE,
-                    std::numeric_limits<uint64_t>::max());
+    vkWaitForFences(
+        m_device.device(),
+        1,
+        &m_inFlightFences[m_currentFrame],
+        VK_TRUE,
+        std::numeric_limits<uint64_t>::max());
 
     VkResult result = vkAcquireNextImageKHR(
         m_device.device(),
@@ -103,16 +106,17 @@ VkResult VgeSwapChain::acquireNextImage(uint32_t* imageIndex)
     return result;
 }
 
-VkResult VgeSwapChain::submitCommandBuffers(const VkCommandBuffer* buffers,
-                                            uint32_t* imageIndex)
+VkResult VgeSwapChain::submitCommandBuffers(
+    const VkCommandBuffer* buffers, uint32_t* imageIndex)
 {
     if (m_imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
     {
-        vkWaitForFences(m_device.device(),
-                        1,
-                        &m_imagesInFlight[*imageIndex],
-                        VK_TRUE,
-                        UINT64_MAX);
+        vkWaitForFences(
+            m_device.device(),
+            1,
+            &m_imagesInFlight[*imageIndex],
+            VK_TRUE,
+            UINT64_MAX);
     }
     m_imagesInFlight[*imageIndex] = m_inFlightFences[m_currentFrame];
 
@@ -139,10 +143,11 @@ VkResult VgeSwapChain::submitCommandBuffers(const VkCommandBuffer* buffers,
     submitInfo.pSignalSemaphores = signalSemaphores;
 
     vkResetFences(m_device.device(), 1, &m_inFlightFences[m_currentFrame]);
-    if (vkQueueSubmit(m_device.graphicsQueue(),
-                      1,
-                      &submitInfo,
-                      m_inFlightFences[m_currentFrame]) != VK_SUCCESS)
+    if (vkQueueSubmit(
+            m_device.graphicsQueue(),
+            1,
+            &submitInfo,
+            m_inFlightFences[m_currentFrame]) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
@@ -257,10 +262,11 @@ void VgeSwapChain::createImageViews()
         viewInfo.subresourceRange.baseArrayLayer = 0;
         viewInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device.device(),
-                              &viewInfo,
-                              nullptr,
-                              &m_swapChainImageViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(
+                m_device.device(),
+                &viewInfo,
+                nullptr,
+                &m_swapChainImageViews[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create texture image view!");
         }
@@ -354,10 +360,11 @@ void VgeSwapChain::createFramebuffers()
         framebufferInfo.height = swapChainExtent.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(m_device.device(),
-                                &framebufferInfo,
-                                nullptr,
-                                &m_swapChainFramebuffers[i]) != VK_SUCCESS)
+        if (vkCreateFramebuffer(
+                m_device.device(),
+                &framebufferInfo,
+                nullptr,
+                &m_swapChainFramebuffers[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create framebuffer!");
         }
@@ -408,11 +415,11 @@ void VgeSwapChain::createDepthResources()
         viewInfo.subresourceRange.baseArrayLayer = 0;
         viewInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device.device(),
-                              &viewInfo,
-                              nullptr,
-                              &m_depthImageViews[static_cast<size_t>(i)]) !=
-            VK_SUCCESS)
+        if (vkCreateImageView(
+                m_device.device(),
+                &viewInfo,
+                nullptr,
+                &m_depthImageViews[static_cast<size_t>(i)]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create texture image view!");
         }
@@ -435,14 +442,16 @@ void VgeSwapChain::createSyncObjects()
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        if (vkCreateSemaphore(m_device.device(),
-                              &semaphoreInfo,
-                              nullptr,
-                              &m_imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(m_device.device(),
-                              &semaphoreInfo,
-                              nullptr,
-                              &m_renderFinishedSemaphores[i]) != VK_SUCCESS ||
+        if (vkCreateSemaphore(
+                m_device.device(),
+                &semaphoreInfo,
+                nullptr,
+                &m_imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(
+                m_device.device(),
+                &semaphoreInfo,
+                nullptr,
+                &m_renderFinishedSemaphores[i]) != VK_SUCCESS ||
             vkCreateFence(
                 m_device.device(), &fenceInfo, nullptr, &m_inFlightFences[i]) !=
                 VK_SUCCESS)

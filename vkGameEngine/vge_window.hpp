@@ -26,18 +26,30 @@ public:
     {
         return glfwWindowShouldClose(m_window);
     }
+
     VkExtent2D getExtent()
     {
         return { static_cast<uint32_t>(m_width),
                  static_cast<uint32_t>(m_height) };
     }
 
+    bool wasWindowResized()
+    {
+        return m_frameBufferResized;
+    }
+
+    void resetWindowResizedFlag()
+    {
+        m_frameBufferResized = false;
+    }
+
     void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 private: // member variables and functions
     GLFWwindow* m_window;
-    const int m_width;
-    const int m_height;
+    int m_width;
+    int m_height;
+    bool m_frameBufferResized = false;
     std::string m_name;
 
     void initWindow();

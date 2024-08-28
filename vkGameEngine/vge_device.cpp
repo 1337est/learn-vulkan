@@ -44,9 +44,10 @@ VkResult CreateDebugUtilsMessengerEXT(
 }
 
 // The debug messenger needs to be deleted as well
-void DestroyDebugUtilsMessengerEXT(VkInstance instance,
-                                   VkDebugUtilsMessengerEXT debugMessenger,
-                                   const VkAllocationCallbacks* pAllocator)
+void DestroyDebugUtilsMessengerEXT(
+    VkInstance instance,
+    VkDebugUtilsMessengerEXT debugMessenger,
+    const VkAllocationCallbacks* pAllocator)
 {
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
         instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -347,8 +348,8 @@ std::vector<const char*> VgeDevice::getRequiredExtensions()
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions,
-                                        glfwExtensions + glfwExtensionCount);
+    std::vector<const char*> extensions(
+        glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (m_enableValidationLayers)
     {
@@ -398,8 +399,8 @@ bool VgeDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
     vkEnumerateDeviceExtensionProperties(
         device, nullptr, &extensionCount, availableExtensions.data());
 
-    std::set<std::string> requiredExtensions(m_deviceExtensions.begin(),
-                                             m_deviceExtensions.end());
+    std::set<std::string> requiredExtensions(
+        m_deviceExtensions.begin(), m_deviceExtensions.end());
 
     for (const auto& extension : availableExtensions)
     {
@@ -485,9 +486,10 @@ SwapChainSupportDetails VgeDevice::querySwapChainSupport(
 }
 
 // Finds image formats supported by the GPU
-VkFormat VgeDevice::findSupportedFormat(const std::vector<VkFormat>& candidates,
-                                        VkImageTiling tiling,
-                                        VkFormatFeatureFlags features)
+VkFormat VgeDevice::findSupportedFormat(
+    const std::vector<VkFormat>& candidates,
+    VkImageTiling tiling,
+    VkFormatFeatureFlags features)
 {
     for (VkFormat format : candidates)
     {
@@ -499,8 +501,9 @@ VkFormat VgeDevice::findSupportedFormat(const std::vector<VkFormat>& candidates,
         {
             return format;
         }
-        else if (tiling == VK_IMAGE_TILING_OPTIMAL &&
-                 (props.optimalTilingFeatures & features) == features)
+        else if (
+            tiling == VK_IMAGE_TILING_OPTIMAL &&
+            (props.optimalTilingFeatures & features) == features)
         {
             return format;
         }
@@ -509,8 +512,8 @@ VkFormat VgeDevice::findSupportedFormat(const std::vector<VkFormat>& candidates,
 }
 
 // Find the memory properties for your GPU
-uint32_t VgeDevice::findMemoryType(uint32_t typeFilter,
-                                   VkMemoryPropertyFlags properties)
+uint32_t VgeDevice::findMemoryType(
+    uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &memProperties);
@@ -528,11 +531,12 @@ uint32_t VgeDevice::findMemoryType(uint32_t typeFilter,
 }
 
 // Create a memory storage buffer
-void VgeDevice::createBuffer(VkDeviceSize size,
-                             VkBufferUsageFlags usage,
-                             VkMemoryPropertyFlags properties,
-                             VkBuffer& buffer,
-                             VkDeviceMemory& bufferMemory)
+void VgeDevice::createBuffer(
+    VkDeviceSize size,
+    VkBufferUsageFlags usage,
+    VkMemoryPropertyFlags properties,
+    VkBuffer& buffer,
+    VkDeviceMemory& bufferMemory)
 {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -600,9 +604,8 @@ void VgeDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer)
 }
 
 // Copy source buffer to destination buffer and cleanup
-void VgeDevice::copyBuffer(VkBuffer srcBuffer,
-                           VkBuffer dstBuffer,
-                           VkDeviceSize size)
+void VgeDevice::copyBuffer(
+    VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -616,11 +619,12 @@ void VgeDevice::copyBuffer(VkBuffer srcBuffer,
 }
 
 // Copy the buffer data to an image
-void VgeDevice::copyBufferToImage(VkBuffer buffer,
-                                  VkImage image,
-                                  uint32_t width,
-                                  uint32_t height,
-                                  uint32_t layerCount)
+void VgeDevice::copyBufferToImage(
+    VkBuffer buffer,
+    VkImage image,
+    uint32_t width,
+    uint32_t height,
+    uint32_t layerCount)
 {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -637,20 +641,22 @@ void VgeDevice::copyBufferToImage(VkBuffer buffer,
     region.imageOffset = { 0, 0, 0 };
     region.imageExtent = { width, height, 1 };
 
-    vkCmdCopyBufferToImage(commandBuffer,
-                           buffer,
-                           image,
-                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                           1,
-                           &region);
+    vkCmdCopyBufferToImage(
+        commandBuffer,
+        buffer,
+        image,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        &region);
     endSingleTimeCommands(commandBuffer);
 }
 
 // Create a Vulkan image
-void VgeDevice::createImageWithInfo(const VkImageCreateInfo& imageInfo,
-                                    VkMemoryPropertyFlags properties,
-                                    VkImage& image,
-                                    VkDeviceMemory& imageMemory)
+void VgeDevice::createImageWithInfo(
+    const VkImageCreateInfo& imageInfo,
+    VkMemoryPropertyFlags properties,
+    VkImage& image,
+    VkDeviceMemory& imageMemory)
 {
     if (vkCreateImage(m_device_, &imageInfo, nullptr, &image) != VK_SUCCESS)
     {
