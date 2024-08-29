@@ -1,17 +1,25 @@
 // headers
 #include "app.hpp"
+#include <vulkan/vulkan_core.h>
 
-#include "vge_pipeline.hpp"
+// libraries
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
 
 // std
-#include <GLFW/glfw3.h>
 #include <array>
-#include <memory>
+#include <cassert>
 #include <stdexcept>
-#include <vulkan/vulkan_core.h>
 
 namespace vge
 {
+
+struct SimplePushConstantData
+{
+    glm::vec2 offset;
+    alignas(16) glm::vec3 color;
+};
 
 App::App()
     : m_vgeSwapChain{}
@@ -43,52 +51,6 @@ void App::run()
     vkDeviceWaitIdle(m_vgeDevice.device());
 }
 
-// Sierpinski exercise: draws recursive triangle
-void App::sierpinski(
-    std::vector<VgeModel::Vertex>& vertices,
-    int cuts,
-    glm::vec2 a,
-    glm::vec2 b,
-    glm::vec2 c,
-    [[maybe_unused]] glm::vec3 RGBColor)
-{
-    glm::vec3 red = { 1.0f, 0.0f, 0.0f };
-    glm::vec3 green = { 0.0f, 1.0f, 0.0f };
-    glm::vec3 blue = { 0.0f, 0.0f, 1.0f };
-
-    if (cuts <= 0)
-    {
-        vertices.push_back({ a, RGBColor });
-        vertices.push_back({ b, RGBColor });
-        vertices.push_back({ c, RGBColor });
-    }
-    else
-    {
-        auto ab = 0.5f * (a + b);
-        auto ac = 0.5f * (a + c);
-        auto bc = 0.5f * (b + c);
-        // colored like the LOZ triforce (colors counterclockwise)
-        sierpinski(vertices, cuts - 1, a, ab, ac, red);   // top triangle
-        sierpinski(vertices, cuts - 1, ab, b, bc, green); // right triangle
-        sierpinski(vertices, cuts - 1, ac, bc, c, blue);  // left triangle
-    }
-}
-
-void App::loadModels()
-{
-    std::vector<VgeModel::Vertex> vertices{};
-    glm::vec3 vertColor{};
-    sierpinski(
-        vertices,
-        2,
-        { 0.0f, -0.5f },
-        { 0.5f, 0.5f },
-        { -0.5f, 0.5f },
-        vertColor);
-    m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
-}
-
-/*
 void App::loadModels()
 {
     std::vector<VgeModel::Vertex> vertices{
@@ -98,16 +60,21 @@ void App::loadModels()
     };
     m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
 }
-*/
 
 void App::createPipelineLayout()
 {
+    VkPushConstantRange pushConstantRange{};
+    pushConstantRange.stageFlags =
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    pushConstantRange.offset = 0;
+    pushConstantRange.size = sizeof(SimplePushConstantData);
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 0;
     pipelineLayoutInfo.pSetLayouts = nullptr;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-    pipelineLayoutInfo.pPushConstantRanges = nullptr;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
     if (vkCreatePipelineLayout(
             m_vgeDevice.device(),
             &pipelineLayoutInfo,
@@ -202,6 +169,9 @@ void App::freeCommandBuffers()
 
 void App::recordCommandBuffer(size_t imageIndex)
 {
+    static int frame = 0;
+    frame = (frame + 1) % 10'000;
+
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -220,8 +190,8 @@ void App::recordCommandBuffer(size_t imageIndex)
     renderPassInfo.renderArea.extent = m_vgeSwapChain->getSwapChainExtent();
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f }; // index 0 is color
-    clearValues[1].depthStencil = { 1.0f, 0 };         // index 1 is depth
+    clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f }; // index 0 is color
+    clearValues[1].depthStencil = { 1.0f, 0 };            // index 1 is depth
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 
     renderPassInfo.pClearValues = clearValues.data();
@@ -249,7 +219,23 @@ void App::recordCommandBuffer(size_t imageIndex)
 
     m_vgePipeline->bind(m_commandBuffers[imageIndex]);
     m_vgeModel->bind(m_commandBuffers[imageIndex]);
-    m_vgeModel->draw(m_commandBuffers[imageIndex]);
+
+    for (int j = 0; j < 4; j++)
+    {
+        SimplePushConstantData pushData{};
+        pushData.offset = { -0.5f + static_cast<float>(frame) * 0.0002f,
+                            -0.4f + static_cast<float>(j) * 0.25f };
+        pushData.color = { 0.0f, 0.0f, 0.2f + 0.2f * static_cast<float>(j) };
+
+        vkCmdPushConstants(
+            m_commandBuffers[imageIndex],
+            m_pipelineLayout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            sizeof(SimplePushConstantData),
+            &pushData);
+        m_vgeModel->draw(m_commandBuffers[imageIndex]);
+    }
 
     vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
     if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS)
@@ -290,3 +276,50 @@ void App::drawFrame()
 }
 
 } // namespace vge
+
+/*
+// Sierpinski exercise: draws recursive triangle
+void App::sierpinski(
+    std::vector<VgeModel::Vertex>& vertices,
+    int cuts,
+    glm::vec2 a,
+    glm::vec2 b,
+    glm::vec2 c,
+    [[maybe_unused]] glm::vec3 RGBColor)
+{
+    glm::vec3 red = { 1.0f, 0.0f, 0.0f };
+    glm::vec3 green = { 0.0f, 1.0f, 0.0f };
+    glm::vec3 blue = { 0.0f, 0.0f, 1.0f };
+
+    if (cuts <= 0)
+    {
+        vertices.push_back({ a, RGBColor });
+        vertices.push_back({ b, RGBColor });
+        vertices.push_back({ c, RGBColor });
+    }
+    else
+    {
+        auto ab = 0.5f * (a + b);
+        auto ac = 0.5f * (a + c);
+        auto bc = 0.5f * (b + c);
+        // colored like the LOZ triforce (colors counterclockwise)
+        sierpinski(vertices, cuts - 1, a, ab, ac, red);   // top triangle
+        sierpinski(vertices, cuts - 1, ab, b, bc, green); // right triangle
+        sierpinski(vertices, cuts - 1, ac, bc, c, blue);  // left triangle
+    }
+}
+
+void App::loadModels()
+{
+    std::vector<VgeModel::Vertex> vertices{};
+    glm::vec3 vertColor{};
+    sierpinski(
+        vertices,
+        2,
+        { 0.0f, -0.5f },
+        { 0.5f, 0.5f },
+        { -0.5f, 0.5f },
+        vertColor);
+    m_vgeModel = std::make_unique<VgeModel>(m_vgeDevice, vertices);
+}
+*/

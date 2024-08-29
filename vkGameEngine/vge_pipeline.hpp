@@ -2,6 +2,8 @@
 
 // headers
 #include "vge_device.hpp"
+
+// libraries
 #include <vulkan/vulkan_core.h>
 
 // std

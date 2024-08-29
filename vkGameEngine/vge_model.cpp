@@ -1,5 +1,7 @@
 // headers
 #include "vge_model.hpp"
+
+// libraries
 #include <vulkan/vulkan_core.h>
 
 // std

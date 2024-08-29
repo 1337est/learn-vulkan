@@ -1,6 +1,7 @@
 // headers
 #include "vge_window.hpp"
 
+// libraries
 #include <GLFW/glfw3.h>
 
 // std

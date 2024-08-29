@@ -7,6 +7,7 @@
 #include "vge_swapchain.hpp"
 #include "vge_window.hpp"
 
+// libraries
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan_core.h>
 
