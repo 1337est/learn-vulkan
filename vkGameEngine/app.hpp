@@ -2,7 +2,7 @@
 
 // headers
 #include "vge_device.hpp"
-#include "vge_model.hpp"
+#include "vge_game_object.hpp"
 #include "vge_pipeline.hpp"
 #include "vge_swapchain.hpp"
 #include "vge_window.hpp"
@@ -42,7 +42,7 @@ private:
         glm::vec2 c,
         glm::vec3 color);
 
-    void loadModels();
+    void loadGameObjects();
     void createPipelineLayout();
     void createPipeline();
     void createCommandBuffers();
@@ -50,6 +50,7 @@ private:
     void drawFrame();
     void recreateSwapChain();
     void recordCommandBuffer(size_t imageIndex);
+    void renderGameObjects(VkCommandBuffer commandBuffer);
 
     VgeWindow m_vgeWindow{ WIDTH, HEIGHT, "Hello Vulkan!" }; //  window
     VgeDevice m_vgeDevice{ m_vgeWindow }; // use device for window
@@ -57,7 +58,7 @@ private:
     std::unique_ptr<VgePipeline> m_vgePipeline;
     VkPipelineLayout m_pipelineLayout;
     std::vector<VkCommandBuffer> m_commandBuffers;
-    std::unique_ptr<VgeModel> m_vgeModel;
+    std::vector<VgeGameObject> m_gameObjects;
 };
 
 } // namespace vge
