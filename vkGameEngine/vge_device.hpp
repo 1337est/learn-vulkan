@@ -20,7 +20,8 @@ struct SwapChainSupportDetails
         : capabilities{}
         , formats{}
         , presentModes{}
-    {}
+    {
+    }
 };
 
 struct QueueFamilyIndices
@@ -33,7 +34,8 @@ struct QueueFamilyIndices
     QueueFamilyIndices()
         : graphicsFamily{ 0 }
         , presentFamily{ 0 }
-    {}
+    {
+    }
 
     bool isComplete()
     {

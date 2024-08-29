@@ -1,5 +1,6 @@
 // headers
 #include "app.hpp"
+
 #include "vge_pipeline.hpp"
 
 // std
@@ -67,9 +68,9 @@ void App::sierpinski(
         auto ac = 0.5f * (a + c);
         auto bc = 0.5f * (b + c);
         // colored like the LOZ triforce (colors counterclockwise)
-        sierpinski(vertices, cuts - 1, a, ab, ac, red);
-        sierpinski(vertices, cuts - 1, ab, b, bc, green);
-        sierpinski(vertices, cuts - 1, ac, bc, c, blue);
+        sierpinski(vertices, cuts - 1, a, ab, ac, red);   // top triangle
+        sierpinski(vertices, cuts - 1, ab, b, bc, green); // right triangle
+        sierpinski(vertices, cuts - 1, ac, bc, c, blue);  // left triangle
     }
 }
 
@@ -79,7 +80,7 @@ void App::loadModels()
     glm::vec3 vertColor{};
     sierpinski(
         vertices,
-        1,
+        2,
         { 0.0f, -0.5f },
         { 0.5f, 0.5f },
         { -0.5f, 0.5f },
@@ -119,9 +120,15 @@ void App::createPipelineLayout()
 
 void App::createPipeline()
 {
-    auto pipelineConfig = VgePipeline::defaultPipelineConfigInfo(
-        m_vgeSwapChain->width(),
-        m_vgeSwapChain->height());
+    assert(
+        m_vgeSwapChain != nullptr &&
+        "Cannot create pipeline before swapchain!");
+    assert(
+        m_pipelineLayout != nullptr &&
+        "Cannot create pipeline before pipeline layout!");
+
+    PipelineConfigInfo pipelineConfig{};
+    VgePipeline::defaultPipelineConfigInfo(pipelineConfig);
     pipelineConfig.renderPass = m_vgeSwapChain->getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
     m_vgePipeline = std::make_unique<VgePipeline>(
@@ -139,9 +146,26 @@ void App::recreateSwapChain()
         extent = m_vgeWindow.getExtent();
         glfwWaitEvents();
     }
-
     vkDeviceWaitIdle(m_vgeDevice.device());
-    m_vgeSwapChain = std::make_unique<VgeSwapChain>(m_vgeDevice, extent);
+
+    if (m_vgeSwapChain == nullptr)
+    {
+        m_vgeSwapChain = std::make_unique<VgeSwapChain>(m_vgeDevice, extent);
+    }
+    else
+    {
+        m_vgeSwapChain = std::make_unique<VgeSwapChain>(
+            m_vgeDevice,
+            extent,
+            std::move(m_vgeSwapChain));
+        if (m_vgeSwapChain->imageCount() != m_commandBuffers.size())
+        {
+            freeCommandBuffers();
+            createCommandBuffers();
+        }
+    }
+
+    // TODO: If render pass is compatible, do nothing else
     createPipeline();
 }
 
@@ -163,6 +187,17 @@ void App::createCommandBuffers()
     {
         throw std::runtime_error("Failed to allocate command buffersf!");
     }
+}
+
+void App::freeCommandBuffers()
+{
+    vkFreeCommandBuffers(
+        m_vgeDevice.device(),
+        m_vgeDevice.getCommandPool(),
+        static_cast<uint32_t>(m_commandBuffers.size()),
+        m_commandBuffers.data());
+
+    m_commandBuffers.clear();
 }
 
 void App::recordCommandBuffer(size_t imageIndex)
@@ -195,6 +230,22 @@ void App::recordCommandBuffer(size_t imageIndex)
         m_commandBuffers[imageIndex],
         &renderPassInfo,
         VK_SUBPASS_CONTENTS_INLINE);
+
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width =
+        static_cast<float>(m_vgeSwapChain->getSwapChainExtent().width);
+    viewport.height =
+        static_cast<float>(m_vgeSwapChain->getSwapChainExtent().height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    VkRect2D scissor{
+        { 0, 0 },
+        m_vgeSwapChain->getSwapChainExtent()
+    };
+    vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
+    vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
     m_vgePipeline->bind(m_commandBuffers[imageIndex]);
     m_vgeModel->bind(m_commandBuffers[imageIndex]);

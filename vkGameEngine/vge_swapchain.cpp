@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <set>
 #include <stdexcept>
 
@@ -26,10 +27,44 @@ VgeSwapChain::VgeSwapChain(VgeDevice& deviceRef, VkExtent2D extent)
     , m_device{ deviceRef }
     , m_windowExtent{ extent }
     , m_swapChain{}
+    , m_oldSwapChain{}
     , m_imageAvailableSemaphores{}
     , m_renderFinishedSemaphores{}
     , m_inFlightFences{}
     , m_imagesInFlight{}
+{
+    initSwapChain();
+}
+
+VgeSwapChain::VgeSwapChain(
+    VgeDevice& deviceRef,
+    VkExtent2D extent,
+    std::shared_ptr<VgeSwapChain> previous)
+    : m_swapChainImageFormat{}
+    , m_swapChainExtent{}
+    , m_swapChainFramebuffers{}
+    , m_renderPass{}
+    , m_depthImages{}
+    , m_depthImageMemorys{}
+    , m_depthImageViews{}
+    , m_swapChainImages{}
+    , m_swapChainImageViews{}
+    , m_device{ deviceRef }
+    , m_windowExtent{ extent }
+    , m_swapChain{}
+    , m_oldSwapChain{ previous }
+    , m_imageAvailableSemaphores{}
+    , m_renderFinishedSemaphores{}
+    , m_inFlightFences{}
+    , m_imagesInFlight{}
+{
+    initSwapChain();
+
+    // clean up old swap chain since it's no longer needed
+    m_oldSwapChain = nullptr;
+}
+
+void VgeSwapChain::initSwapChain()
 {
     createSwapChain();
     createImageViews();
@@ -229,7 +264,9 @@ void VgeSwapChain::createSwapChain()
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
 
-    createInfo.oldSwapchain = VK_NULL_HANDLE;
+    createInfo.oldSwapchain = m_oldSwapChain == nullptr
+                                  ? VK_NULL_HANDLE
+                                  : m_oldSwapChain->m_swapChain;
 
     if (vkCreateSwapchainKHR(
             m_device.device(),
