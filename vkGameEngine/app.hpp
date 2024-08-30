@@ -4,7 +4,7 @@
 #include "vge_device.hpp"
 #include "vge_game_object.hpp"
 #include "vge_pipeline.hpp"
-#include "vge_swapchain.hpp"
+#include "vge_renderer.hpp"
 #include "vge_window.hpp"
 
 // libraries
@@ -33,32 +33,28 @@ public:
     void run();
 
 private:
-    // Sierpinski exercise: draws recursive triangle
-    void sierpinski(
-        std::vector<VgeModel::Vertex>& vertices,
-        int cuts,
-        glm::vec2 a,
-        glm::vec2 b,
-        glm::vec2 c,
-        glm::vec3 color);
-
     void loadGameObjects();
     void createPipelineLayout();
     void createPipeline();
-    void createCommandBuffers();
-    void freeCommandBuffers();
-    void drawFrame();
-    void recreateSwapChain();
-    void recordCommandBuffer(size_t imageIndex);
     void renderGameObjects(VkCommandBuffer commandBuffer);
 
     VgeWindow m_vgeWindow{ WIDTH, HEIGHT, "Hello Vulkan!" }; //  window
     VgeDevice m_vgeDevice{ m_vgeWindow }; // use device for window
-    std::unique_ptr<VgeSwapChain> m_vgeSwapChain;
+    VgeRenderer m_vgeRenderer{ m_vgeWindow, m_vgeDevice };
     std::unique_ptr<VgePipeline> m_vgePipeline;
     VkPipelineLayout m_pipelineLayout;
-    std::vector<VkCommandBuffer> m_commandBuffers;
     std::vector<VgeGameObject> m_gameObjects;
 };
 
 } // namespace vge
+
+/*
+// Sierpinski exercise: draws recursive triangle
+void sierpinski(
+    std::vector<VgeModel::Vertex>& vertices,
+    int cuts,
+    glm::vec2 a,
+    glm::vec2 b,
+    glm::vec2 c,
+    glm::vec3 color);
+*/

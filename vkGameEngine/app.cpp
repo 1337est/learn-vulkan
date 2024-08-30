@@ -25,16 +25,13 @@ struct SimplePushConstantData
 };
 
 App::App()
-    : m_vgeSwapChain{}
-    , m_vgePipeline{}
+    : m_vgePipeline{}
     , m_pipelineLayout{}
-    , m_commandBuffers{}
     , m_gameObjects{}
 {
     loadGameObjects();
     createPipelineLayout();
-    recreateSwapChain();
-    createCommandBuffers();
+    createPipeline();
 }
 
 App::~App()
@@ -48,7 +45,15 @@ void App::run()
     while (!m_vgeWindow.shouldClose())
     {
         glfwPollEvents(); // continuously processes and returns received events
-        drawFrame();
+
+        // beginFrame returns nullptr if swapchain needs to be recreated
+        if (auto commandBuffer = m_vgeRenderer.beginFrame())
+        {
+            m_vgeRenderer.beginSwapChainRenderPass(commandBuffer);
+            renderGameObjects(commandBuffer);
+            m_vgeRenderer.endSwapChainRenderPass(commandBuffer);
+            m_vgeRenderer.endFrame();
+        }
     }
 
     vkDeviceWaitIdle(m_vgeDevice.device());
@@ -100,139 +105,18 @@ void App::createPipelineLayout()
 void App::createPipeline()
 {
     assert(
-        m_vgeSwapChain != nullptr &&
-        "Cannot create pipeline before swapchain!");
-    assert(
         m_pipelineLayout != nullptr &&
         "Cannot create pipeline before pipeline layout!");
 
     PipelineConfigInfo pipelineConfig{};
     VgePipeline::defaultPipelineConfigInfo(pipelineConfig);
-    pipelineConfig.renderPass = m_vgeSwapChain->getRenderPass();
+    pipelineConfig.renderPass = m_vgeRenderer.getSwapChainRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
     m_vgePipeline = std::make_unique<VgePipeline>(
         m_vgeDevice,
         "./shaders/shader.vert.spv",
         "./shaders/shader.frag.spv",
         pipelineConfig);
-}
-
-void App::recreateSwapChain()
-{
-    auto extent = m_vgeWindow.getExtent();
-    while (extent.width == 0 || extent.height == 0)
-    {
-        extent = m_vgeWindow.getExtent();
-        glfwWaitEvents();
-    }
-    vkDeviceWaitIdle(m_vgeDevice.device());
-
-    if (m_vgeSwapChain == nullptr)
-    {
-        m_vgeSwapChain = std::make_unique<VgeSwapChain>(m_vgeDevice, extent);
-    }
-    else
-    {
-        m_vgeSwapChain = std::make_unique<VgeSwapChain>(
-            m_vgeDevice,
-            extent,
-            std::move(m_vgeSwapChain));
-        if (m_vgeSwapChain->imageCount() != m_commandBuffers.size())
-        {
-            freeCommandBuffers();
-            createCommandBuffers();
-        }
-    }
-
-    // TODO: If render pass is compatible, do nothing else
-    createPipeline();
-}
-
-void App::createCommandBuffers()
-{
-    m_commandBuffers.resize(m_vgeSwapChain->imageCount());
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = m_vgeDevice.getCommandPool();
-    allocInfo.commandBufferCount =
-        static_cast<uint32_t>(m_commandBuffers.size());
-
-    if (vkAllocateCommandBuffers(
-            m_vgeDevice.device(),
-            &allocInfo,
-            m_commandBuffers.data()) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to allocate command buffersf!");
-    }
-}
-
-void App::freeCommandBuffers()
-{
-    vkFreeCommandBuffers(
-        m_vgeDevice.device(),
-        m_vgeDevice.getCommandPool(),
-        static_cast<uint32_t>(m_commandBuffers.size()),
-        m_commandBuffers.data());
-
-    m_commandBuffers.clear();
-}
-
-void App::recordCommandBuffer(size_t imageIndex)
-{
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (vkBeginCommandBuffer(m_commandBuffers[imageIndex], &beginInfo) !=
-        VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to begin recording command buffer!");
-    }
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_vgeSwapChain->getRenderPass();
-    renderPassInfo.framebuffer = m_vgeSwapChain->getFrameBuffer(imageIndex);
-
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = m_vgeSwapChain->getSwapChainExtent();
-
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f }; // index 0 is color
-    clearValues[1].depthStencil = { 1.0f, 0 };            // index 1 is depth
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-
-    renderPassInfo.pClearValues = clearValues.data();
-
-    vkCmdBeginRenderPass(
-        m_commandBuffers[imageIndex],
-        &renderPassInfo,
-        VK_SUBPASS_CONTENTS_INLINE);
-
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width =
-        static_cast<float>(m_vgeSwapChain->getSwapChainExtent().width);
-    viewport.height =
-        static_cast<float>(m_vgeSwapChain->getSwapChainExtent().height);
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    VkRect2D scissor{
-        { 0, 0 },
-        m_vgeSwapChain->getSwapChainExtent()
-    };
-    vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
-    vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
-
-    renderGameObjects(m_commandBuffers[imageIndex]);
-
-    vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
-    if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to record command buffer!");
-    }
 }
 
 void App::renderGameObjects(VkCommandBuffer commandBuffer)
@@ -258,37 +142,6 @@ void App::renderGameObjects(VkCommandBuffer commandBuffer)
             &pushData);
         obj.model->bind(commandBuffer);
         obj.model->draw(commandBuffer);
-    }
-}
-
-void App::drawFrame()
-{
-    uint32_t imageIndex;
-    auto result = m_vgeSwapChain->acquireNextImage(&imageIndex);
-
-    if (result == VK_ERROR_OUT_OF_DATE_KHR)
-    {
-        throw std::runtime_error("Failed to acquire swap chain image!");
-    }
-    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-    {
-        throw std::runtime_error("Failed to acquire swap chain image!");
-    }
-
-    recordCommandBuffer(imageIndex);
-    result = m_vgeSwapChain->submitCommandBuffers(
-        &m_commandBuffers[imageIndex],
-        &imageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-        m_vgeWindow.wasWindowResized())
-    {
-        m_vgeWindow.resetWindowResizedFlag();
-        recreateSwapChain();
-        return;
-    }
-    if (result != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to present swap chain image!");
     }
 }
 
