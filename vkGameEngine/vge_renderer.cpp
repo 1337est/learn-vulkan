@@ -43,21 +43,21 @@ void VgeRenderer::recreateSwapChain()
     }
     else
     {
-        m_vgeSwapChain = std::make_unique<VgeSwapChain>(
-            m_vgeDevice,
-            extent,
-            std::move(m_vgeSwapChain));
-        if (m_vgeSwapChain->imageCount() != m_commandBuffers.size())
+        std::shared_ptr<VgeSwapChain> oldSwapChain = std::move(m_vgeSwapChain);
+        m_vgeSwapChain =
+            std::make_unique<VgeSwapChain>(m_vgeDevice, extent, oldSwapChain);
+
+        if (!oldSwapChain->compareSwapFormats(*m_vgeSwapChain.get()))
         {
-            freeCommandBuffers();
-            createCommandBuffers();
+            throw std::runtime_error(
+                "Swap chain image(or depth) format has changed!");
         }
     }
 }
 
 void VgeRenderer::createCommandBuffers()
 {
-    m_commandBuffers.resize(m_vgeSwapChain->imageCount());
+    m_commandBuffers.resize(VgeSwapChain::MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -144,6 +144,8 @@ void VgeRenderer::endFrame()
     }
 
     m_isFrameStarted = false;
+    m_currentFrameIndex =
+        (m_currentFrameIndex + 1) % VgeSwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
 void VgeRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)

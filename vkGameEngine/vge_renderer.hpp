@@ -41,7 +41,15 @@ public:
         assert(
             m_isFrameStarted &&
             "Cannot get command buffer when frame not in progress");
-        return m_commandBuffers[m_currentImageIndex];
+        return m_commandBuffers[m_currentFrameIndex];
+    }
+
+    uint32_t getFrameIndex() const
+    {
+        assert(
+            m_isFrameStarted &&
+            "Cannot get frame index when frame not in progress");
+        return m_currentFrameIndex;
     }
 
     VkCommandBuffer beginFrame();
@@ -60,6 +68,7 @@ private:
     std::vector<VkCommandBuffer> m_commandBuffers;
 
     uint32_t m_currentImageIndex;
+    uint32_t m_currentFrameIndex{ 0 };
     bool m_isFrameStarted{ false };
 };
 

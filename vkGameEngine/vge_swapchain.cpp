@@ -16,6 +16,7 @@ namespace vge
 
 VgeSwapChain::VgeSwapChain(VgeDevice& deviceRef, VkExtent2D extent)
     : m_swapChainImageFormat{}
+    , m_swapChainDepthFormat{}
     , m_swapChainExtent{}
     , m_swapChainFramebuffers{}
     , m_renderPass{}
@@ -41,6 +42,7 @@ VgeSwapChain::VgeSwapChain(
     VkExtent2D extent,
     std::shared_ptr<VgeSwapChain> previous)
     : m_swapChainImageFormat{}
+    , m_swapChainDepthFormat{}
     , m_swapChainExtent{}
     , m_swapChainFramebuffers{}
     , m_renderPass{}
@@ -428,6 +430,7 @@ void VgeSwapChain::createFramebuffers()
 void VgeSwapChain::createDepthResources()
 {
     VkFormat depthFormat = findDepthFormat();
+    m_swapChainDepthFormat = depthFormat;
     VkExtent2D swapChainExtent = getSwapChainExtent();
 
     m_depthImages.resize(imageCount());

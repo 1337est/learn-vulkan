@@ -3,7 +3,6 @@
 // headers
 #include "vge_device.hpp"
 #include "vge_game_object.hpp"
-#include "vge_pipeline.hpp"
 #include "vge_renderer.hpp"
 #include "vge_window.hpp"
 
@@ -18,43 +17,27 @@
 namespace vge
 {
 
-class App
+class VgeApp
 {
 public:
     static constexpr int WIDTH = 800;
     static constexpr int HEIGHT = 600;
 
-    App();
-    ~App();
+    VgeApp();
+    ~VgeApp();
 
-    App(const App&) = delete;
-    App& operator=(const App&) = delete;
+    VgeApp(const VgeApp&) = delete;
+    VgeApp& operator=(const VgeApp&) = delete;
 
     void run();
 
 private:
     void loadGameObjects();
-    void createPipelineLayout();
-    void createPipeline();
-    void renderGameObjects(VkCommandBuffer commandBuffer);
 
     VgeWindow m_vgeWindow{ WIDTH, HEIGHT, "Hello Vulkan!" }; //  window
     VgeDevice m_vgeDevice{ m_vgeWindow }; // use device for window
     VgeRenderer m_vgeRenderer{ m_vgeWindow, m_vgeDevice };
-    std::unique_ptr<VgePipeline> m_vgePipeline;
-    VkPipelineLayout m_pipelineLayout;
     std::vector<VgeGameObject> m_gameObjects;
 };
 
 } // namespace vge
-
-/*
-// Sierpinski exercise: draws recursive triangle
-void sierpinski(
-    std::vector<VgeModel::Vertex>& vertices,
-    int cuts,
-    glm::vec2 a,
-    glm::vec2 b,
-    glm::vec2 c,
-    glm::vec3 color);
-*/

@@ -1,5 +1,5 @@
 // headers
-#include "app.hpp"
+#include "vge_app.hpp"
 
 // std
 #include <cstdlib>
@@ -8,7 +8,7 @@
 
 int main()
 {
-    vge::App app{};
+    vge::VgeApp app{};
 
     try
     {
