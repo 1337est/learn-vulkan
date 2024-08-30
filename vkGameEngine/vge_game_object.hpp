@@ -3,32 +3,31 @@
 // headers
 #include "vge_model.hpp"
 
+// libraries
+#include <glm/gtc/matrix_transform.hpp>
+
 // std
 #include <memory>
 
 namespace vge
 {
-struct Transform2DComponent
+struct TransformComponent
 {
-    glm::vec2 translation{}; // position offset
-    glm::vec2 scale{ 1.f, 1.f };
-    float rotation;
+    glm::vec3 translation{};          // position offset
+    glm::vec3 scale{ 1.f, 1.f, 1.f }; // identity matrix
+    glm::vec3 rotation{};
 
-    glm::mat2 mat2()
+    // Matrix transformation corresponds to translate * Ry * Rx * Rz * scale
+    // Rotation convention uses Tait-Bryan angles with axis order Y1, X2, Z3
+    glm::mat4 mat4()
     {
-        // for vector rotations
-        const float sinTheta = glm::sin(rotation);
-        const float cosTheta = glm::cos(rotation);
-        glm::mat2 rotMatrix{
-            { cosTheta,  sinTheta },
-            { -sinTheta, cosTheta }
-        };
-        // for scalar multiplication
-        glm::mat2 scaleMatrix{
-            { scale.x, .0f     },
-            { .0f,     scale.y }
-        };
-        return rotMatrix * scaleMatrix; // identity matrix
+        auto transform = glm::translate(glm::mat4{ 1.f }, translation);
+        transform = glm::rotate(transform, rotation.y, { 0.f, 1.f, 0.f });
+        transform = glm::rotate(transform, rotation.x, { 1.f, 0.f, 0.f });
+        transform = glm::rotate(transform, rotation.z, { 0.f, 0.f, 1.f });
+        transform = glm::scale(transform, scale);
+
+        return transform;
     }
 };
 
@@ -54,9 +53,9 @@ public:
         return m_id;
     }
 
-    std::shared_ptr<VgeModel> model{};
-    glm::vec3 color{};
-    Transform2DComponent transform2D{};
+    std::shared_ptr<VgeModel> m_model{};
+    glm::vec3 m_color{};
+    TransformComponent m_transform{};
 
 private:
     VgeGameObject(id_t objId)

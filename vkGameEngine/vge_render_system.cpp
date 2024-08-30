@@ -18,8 +18,7 @@ namespace vge
 
 struct SimplePushConstantData
 {
-    glm::mat2 transform{ 1.f }; // identity matrix
-    glm::vec2 offset;
+    glm::mat4 m_transform{ 1.f }; // identity matrix
     alignas(16) glm::vec3 color;
 };
 
@@ -86,13 +85,16 @@ void VgeRenderSystem::renderGameObjects(
 
     for (auto& obj : gameObjects)
     {
-        obj.transform2D.rotation =
-            glm::mod(obj.transform2D.rotation + 0.0001f, glm::two_pi<float>());
+        obj.m_transform.rotation.y = glm::mod(
+            obj.m_transform.rotation.y + 0.0001f,
+            glm::two_pi<float>());
+        obj.m_transform.rotation.x = glm::mod(
+            obj.m_transform.rotation.x + 0.00005f,
+            glm::two_pi<float>());
 
         SimplePushConstantData pushData{};
-        pushData.offset = obj.transform2D.translation;
-        pushData.color = obj.color;
-        pushData.transform = obj.transform2D.mat2();
+        pushData.color = obj.m_color;
+        pushData.m_transform = obj.m_transform.mat4();
 
         vkCmdPushConstants(
             commandBuffer,
@@ -101,8 +103,8 @@ void VgeRenderSystem::renderGameObjects(
             0,
             sizeof(SimplePushConstantData),
             &pushData);
-        obj.model->bind(commandBuffer);
-        obj.model->draw(commandBuffer);
+        obj.m_model->bind(commandBuffer);
+        obj.m_model->draw(commandBuffer);
     }
 }
 
