@@ -43,6 +43,11 @@ public:
         m_frameBufferResized = false;
     }
 
+    GLFWwindow* getGLFWwindow() const
+    {
+        return m_window;
+    }
+
     void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 private: // member variables and functions

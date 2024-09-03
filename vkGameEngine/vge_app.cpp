@@ -1,6 +1,7 @@
 // headers
 #include "vge_app.hpp"
 #include "vge_camera.hpp"
+#include "vge_keyboard_movement_controller.hpp"
 #include "vge_render_system.hpp"
 
 // libraries
@@ -12,6 +13,7 @@
 // std
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <stdexcept>
 
 namespace vge
@@ -32,15 +34,34 @@ void VgeApp::run()
     VgeRenderSystem renderSystem{ m_vgeDevice,
                                   m_vgeRenderer.getSwapChainRenderPass() };
     VgeCamera camera{};
-    // camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
     camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
+
+    auto viewerObject = VgeGameObject::createGameObject();
+    VgaKeyboardMovementController cameraController{};
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
 
     // run until window closes
     while (!m_vgeWindow.shouldClose())
     {
         glfwPollEvents(); // continuously processes and returns received events
+
+        auto newTime = std::chrono::high_resolution_clock::now();
+        float frameTime =
+            std::chrono::duration<float, std::chrono::seconds::period>(
+                newTime - currentTime)
+                .count();
+        currentTime = newTime;
+
+        cameraController.moveInPlaneXZ(
+            m_vgeWindow.getGLFWwindow(),
+            frameTime,
+            viewerObject);
+        camera.setViewYXZ(
+            viewerObject.m_transform.translation,
+            viewerObject.m_transform.rotation);
+
         float aspect = m_vgeRenderer.getAspectRatio();
-        // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
         camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
 
         // beginFrame returns nullptr if swapchain needs to be recreated

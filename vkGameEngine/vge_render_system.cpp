@@ -88,13 +88,6 @@ void VgeRenderSystem::renderGameObjects(
 
     for (auto& obj : gameObjects)
     {
-        obj.m_transform.rotation.y = glm::mod(
-            obj.m_transform.rotation.y + 0.0001f,
-            glm::two_pi<float>());
-        obj.m_transform.rotation.x = glm::mod(
-            obj.m_transform.rotation.x + 0.00005f,
-            glm::two_pi<float>());
-
         SimplePushConstantData pushData{};
         pushData.color = obj.m_color;
         pushData.m_transform = projectionView * obj.m_transform.mat4();
