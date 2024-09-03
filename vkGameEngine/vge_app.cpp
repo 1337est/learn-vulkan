@@ -32,6 +32,8 @@ void VgeApp::run()
     VgeRenderSystem renderSystem{ m_vgeDevice,
                                   m_vgeRenderer.getSwapChainRenderPass() };
     VgeCamera camera{};
+    // camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
+    camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
     // run until window closes
     while (!m_vgeWindow.shouldClose())

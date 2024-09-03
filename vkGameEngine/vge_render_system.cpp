@@ -84,6 +84,8 @@ void VgeRenderSystem::renderGameObjects(
 {
     m_vgePipeline->bind(commandBuffer);
 
+    auto projectionView = camera.getProjection() * camera.getView();
+
     for (auto& obj : gameObjects)
     {
         obj.m_transform.rotation.y = glm::mod(
@@ -95,7 +97,7 @@ void VgeRenderSystem::renderGameObjects(
 
         SimplePushConstantData pushData{};
         pushData.color = obj.m_color;
-        pushData.m_transform = camera.getProjection() * obj.m_transform.mat4();
+        pushData.m_transform = projectionView * obj.m_transform.mat4();
 
         vkCmdPushConstants(
             commandBuffer,
