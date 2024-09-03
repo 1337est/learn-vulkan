@@ -31,6 +31,11 @@ public:
         return m_vgeSwapChain->getRenderPass();
     }
 
+    float getAspectRatio() const
+    {
+        return m_vgeSwapChain->extentAspectRatio();
+    }
+
     bool isFrameInProgress() const
     {
         return m_isFrameStarted;

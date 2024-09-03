@@ -1,5 +1,6 @@
 // headers
 #include "vge_app.hpp"
+#include "vge_camera.hpp"
 #include "vge_render_system.hpp"
 
 // libraries
@@ -30,16 +31,24 @@ void VgeApp::run()
 {
     VgeRenderSystem renderSystem{ m_vgeDevice,
                                   m_vgeRenderer.getSwapChainRenderPass() };
+    VgeCamera camera{};
+
     // run until window closes
     while (!m_vgeWindow.shouldClose())
     {
         glfwPollEvents(); // continuously processes and returns received events
+        float aspect = m_vgeRenderer.getAspectRatio();
+        // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+        camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
 
         // beginFrame returns nullptr if swapchain needs to be recreated
         if (auto commandBuffer = m_vgeRenderer.beginFrame())
         {
             m_vgeRenderer.beginSwapChainRenderPass(commandBuffer);
-            renderSystem.renderGameObjects(commandBuffer, m_gameObjects);
+            renderSystem.renderGameObjects(
+                commandBuffer,
+                m_gameObjects,
+                camera);
             m_vgeRenderer.endSwapChainRenderPass(commandBuffer);
             m_vgeRenderer.endFrame();
         }
@@ -115,7 +124,7 @@ void VgeApp::loadGameObjects()
 
     auto cube = VgeGameObject::createGameObject();
     cube.m_model = vgeModel;
-    cube.m_transform.translation = { .0f, .0f, .5f };
+    cube.m_transform.translation = { .0f, .0f, 2.5f };
     cube.m_transform.scale = { .5f, .5f, .5f };
     m_gameObjects.push_back(std::move(cube));
 }

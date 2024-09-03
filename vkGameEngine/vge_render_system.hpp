@@ -1,6 +1,7 @@
 #pragma once
 
 // headers
+#include "vge_camera.hpp"
 #include "vge_device.hpp"
 #include "vge_game_object.hpp"
 #include "vge_pipeline.hpp"
@@ -24,7 +25,8 @@ public:
 
     void renderGameObjects(
         VkCommandBuffer commandBuffer,
-        std::vector<VgeGameObject>& gameObjects);
+        std::vector<VgeGameObject>& gameObjects,
+        const VgeCamera& camera);
 
 private:
     void createPipelineLayout();

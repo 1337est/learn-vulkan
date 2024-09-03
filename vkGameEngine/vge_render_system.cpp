@@ -79,7 +79,8 @@ void VgeRenderSystem::createPipeline(VkRenderPass renderPass)
 
 void VgeRenderSystem::renderGameObjects(
     VkCommandBuffer commandBuffer,
-    std::vector<VgeGameObject>& gameObjects)
+    std::vector<VgeGameObject>& gameObjects,
+    const VgeCamera& camera)
 {
     m_vgePipeline->bind(commandBuffer);
 
@@ -94,7 +95,7 @@ void VgeRenderSystem::renderGameObjects(
 
         SimplePushConstantData pushData{};
         pushData.color = obj.m_color;
-        pushData.m_transform = obj.m_transform.mat4();
+        pushData.m_transform = camera.getProjection() * obj.m_transform.mat4();
 
         vkCmdPushConstants(
             commandBuffer,
